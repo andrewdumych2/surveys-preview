@@ -1,0 +1,3 @@
+export const SURVEY_DRAWER_TRANSITION_MS = 220;
+export const SURVEY_DRAWER_OFFSET_PX = 24;
+export const SURVEY_MENU_TRANSITION_MS = 126;
