@@ -438,7 +438,7 @@ export function getSurveyCellDetails(selection: SurveyCellSelection, surveyId?: 
   const copy = detailCopyByRow[selection.rowLabel] ?? detailCopyByRow.default;
   const delta = buildPreviousDelta(selection);
   const tone = getHealthTone(selection.value);
-  const survey = surveyId ? getSurveyById(surveyId) : defaultSurvey;
+  void (surveyId ? getSurveyById(surveyId) : defaultSurvey);
 
   return {
     title: selection.rowLabel,

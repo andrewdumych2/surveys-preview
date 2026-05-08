@@ -1,4 +1,4 @@
-import{r as c,a as ir,j as e,R as qr}from"./index-DDKoXPw4.js";var Vr=`.styles-module__popup___IhzrD svg[fill=none] {
+import{r as c,a as ir,j as e,R as qr}from"./index-ouhvz1eF.js";var Vr=`.styles-module__popup___IhzrD svg[fill=none] {
   fill: none !important;
 }
 .styles-module__popup___IhzrD svg[fill=none] :not([fill]) {

@@ -400,6 +400,7 @@ function getDrillInRows(selection: KpiDrillInSelection | null) {
 
   return KPI_DRILL_IN_ROW_VARIANTS[hash % KPI_DRILL_IN_ROW_VARIANTS.length];
 }
+void getDrillInRows;
 
 function KpiAssigneeAvatar({
   initials,
@@ -415,6 +416,7 @@ function KpiAssigneeAvatar({
     </span>
   );
 }
+void KpiAssigneeAvatar;
 
 function formatDrillInBreakdownLabel(label: string) {
   const match = label.match(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(?:\s(\d+))?$/);
@@ -1151,6 +1153,10 @@ export function KpiReportsPage({
       description: cardTitle,
       onUndo: () => {
         setCards((currentCards) => {
+          if (!deletedCard) {
+            return currentCards;
+          }
+
           if (currentCards.some((card) => card.title === deletedCard?.title)) {
             return currentCards;
           }
@@ -1178,7 +1184,7 @@ export function KpiReportsPage({
   }
 
   const showPanel = panelSelection !== null;
-  const drillInContent = getKpiDrillInContent(panelSelection);
+  const drillInContent = panelSelection ? getKpiDrillInContent(panelSelection) : null;
 
   return (
     <section
@@ -1265,7 +1271,7 @@ export function KpiReportsPage({
           </div>
         </div>
 
-        {panelSelection ? (
+        {panelSelection && drillInContent ? (
           <DrillInPanel
             ariaLabel="KPI drill in details"
             contentClassName="survey-report-drill-in-content survey-kpi-drill-in-content"

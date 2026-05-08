@@ -340,7 +340,7 @@ export function InvestmentsChart({
               fill: CHART_SECONDARY_TEXT,
               fontSize: 11,
               fontFamily: CHART_NUMERIC_FONT_FAMILY,
-              fontVariantNumeric: "tabular-nums"
+              style: { fontVariantNumeric: "tabular-nums" }
             }}
             tickCount={5}
             tickLine={false}
