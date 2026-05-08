@@ -17,7 +17,15 @@ import { SURVEY_DRAWER_TRANSITION_MS } from "../constants/animation";
 import { getSurveyById } from "../data/surveysData";
 import type { SurveyThemeMode } from "../App";
 
-export function SurveysResultsPage({ themeMode }: { themeMode: SurveyThemeMode }) {
+export function SurveysResultsPage({
+  themeMode,
+  onSidebarToggle,
+  showSidebarToggle
+}: {
+  themeMode: SurveyThemeMode;
+  onSidebarToggle: () => void;
+  showSidebarToggle: boolean;
+}) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<SurveyTabId>("results");
   const [activeSurveyId, setActiveSurveyId] = useState(getDefaultSurveyId);
@@ -114,7 +122,9 @@ export function SurveysResultsPage({ themeMode }: { themeMode: SurveyThemeMode }
       <SurveyHeader
         activeTab={activeTab}
         activeSurveyId={activeSurveyId}
+        onSidebarToggle={onSidebarToggle}
         surveys={surveys}
+        showSidebarToggle={showSidebarToggle}
         onOpenSettings={() => navigate("/surveys/settings")}
         onSurveyChange={(surveyId) => {
           if (surveyId === activeSurveyId) {

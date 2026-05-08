@@ -6,6 +6,7 @@ export interface SurveyPickerOption {
   value: string;
   label: string;
   badgeLabel?: string;
+  iconName?: string;
 }
 
 export function SurveyPicker({
@@ -16,6 +17,7 @@ export function SurveyPicker({
   triggerClassName,
   menuClassName,
   align = "left",
+  selectionMode = "single",
   renderTriggerContent,
   onChange
 }: {
@@ -26,6 +28,7 @@ export function SurveyPicker({
   triggerClassName: string;
   menuClassName?: string;
   align?: "left" | "right";
+  selectionMode?: "single" | "action";
   renderTriggerContent: (selectedOption: SurveyPickerOption | undefined, isOpen: boolean) => ReactNode;
   onChange: (nextValue: string) => void;
 }) {
@@ -129,13 +132,14 @@ export function SurveyPicker({
           >
             {options.map((option) => {
               const isActive = option.value === value;
+              const isSingleSelection = selectionMode === "single";
 
               return (
                 <button
                   key={option.value}
                   type="button"
-                  role="menuitemradio"
-                  aria-checked={isActive}
+                  role={isSingleSelection ? "menuitemradio" : "menuitem"}
+                  aria-checked={isSingleSelection ? isActive : undefined}
                   className={`survey-picker-item ${isActive ? "survey-picker-item-active" : ""}`.trim()}
                   tabIndex={isOpen && isMenuVisible ? 0 : -1}
                   onClick={() => {
@@ -144,8 +148,13 @@ export function SurveyPicker({
                   }}
                 >
                   <span className="survey-picker-item-check" aria-hidden="true">
-                    {isActive ? <SurveyIcon name="check" /> : null}
+                    {isSingleSelection && isActive ? <SurveyIcon name="check" /> : null}
                   </span>
+                  {option.iconName ? (
+                    <span className="survey-picker-item-icon" aria-hidden="true">
+                      <SurveyIcon name={option.iconName} />
+                    </span>
+                  ) : null}
                   <span className="survey-picker-item-label">{option.label}</span>
                   {option.badgeLabel ? <span className="survey-picker-badge">{option.badgeLabel}</span> : null}
                 </button>

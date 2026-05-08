@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { CanvasSidebarToggle } from "../components/surveys/CanvasSidebarToggle";
 import { SurveyPicker, type SurveyPickerOption } from "../components/surveys/SurveyPicker";
 import { SurveyIcon } from "../components/surveys/SurveyIcons";
 import { Toggle } from "../components/ui/Toggle";
@@ -88,7 +89,13 @@ const cadenceOptions: readonly SurveyPickerOption[] = [
   { value: "Yearly", label: "Yearly" }
 ];
 
-export function SurveysSettingsPage() {
+export function SurveysSettingsPage({
+  onSidebarToggle,
+  showSidebarToggle
+}: {
+  onSidebarToggle: () => void;
+  showSidebarToggle: boolean;
+}) {
   const [topics, setTopics] = useState(() => surveySettingsTopics.map((topic) => ({ ...topic })));
   const [startDate, setStartDate] = useState(surveySettingsStartDateLabel);
   const [cadence, setCadence] = useState(surveySettingsCadenceLabel);
@@ -105,6 +112,16 @@ export function SurveysSettingsPage() {
     <section className="survey-main-canvas survey-settings-page-shell">
       <div className="survey-settings-page-scroll">
         <div className="survey-settings-page-content">
+          <header className="survey-canvas-section-header survey-settings-page-header">
+            <div className="survey-canvas-header-leading">
+              {showSidebarToggle ? <CanvasSidebarToggle onToggle={onSidebarToggle} /> : null}
+              <div>
+                <h1 className="survey-report-title">Survey settings</h1>
+                <p className="survey-settings-description">Tune the schedule, topics, teams, and reminders.</p>
+              </div>
+            </div>
+          </header>
+
           <SettingsSelectRow
             title="Start date"
             description="Managers will receive the survey link in the morning of the scheduled date. The survey will remain open for 7 days."

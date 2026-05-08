@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { IconButton } from "../components/ui/IconButton";
 import { Button } from "../components/ui/Button";
+import { DrillInPanel } from "../components/ui/DrillInPanel";
 import { toast } from "../components/ui/toast";
 import { Toggle } from "../components/ui/Toggle";
+import { WorkTypeBadge } from "../components/ui/WorkTypeBadge";
+import { InvestmentsChart } from "../components/charts/InvestmentsChart";
+import { CanvasSidebarToggle } from "../components/surveys/CanvasSidebarToggle";
 import { SurveyIcon } from "../components/surveys/SurveyIcons";
+import avatar0 from "../assets/avatars/avatar-0.png";
+import avatar1 from "../assets/avatars/avatar-1.png";
+import avatar2 from "../assets/avatars/avatar-2.png";
 import { surveys } from "../data/surveysData";
 import type { SurveyThemeMode } from "../App";
 
@@ -77,6 +84,84 @@ const TYPOGRAPHY = [
   }
 ] as const;
 
+const PRIORITY_STYLE_GUIDE_ITEMS = [
+  { label: "Highest", icon: "priority-highest", className: "survey-kpi-drill-in-priority-highest" },
+  { label: "High", icon: "priority-high", className: "survey-kpi-drill-in-priority-high" },
+  { label: "Medium", icon: "priority-medium", className: "survey-kpi-drill-in-priority-medium" },
+  { label: "Low", icon: "priority-low", className: "survey-kpi-drill-in-priority-low" },
+  { label: "Lowest", icon: "priority-lowest", className: "survey-kpi-drill-in-priority-lowest" }
+] as const;
+
+const WORK_TYPE_BADGE_ITEMS = ["Features", "Bugs", "Maintenance"] as const;
+
+const STYLE_GUIDE_ISSUE_ROWS = [
+  {
+    id: "ENG-412",
+    title: "Ship workspace-level spending attribution by team",
+    status: "Done",
+    priorityIcon: "priority-highest",
+    priorityClassName: "survey-kpi-drill-in-priority-highest",
+    estimate: "8",
+    assignee: "MK",
+    avatar: avatar1
+  },
+  {
+    id: "ENG-401",
+    title: "Break down feature work against maintenance allocation",
+    status: "Done",
+    priorityIcon: "priority-high",
+    priorityClassName: "survey-kpi-drill-in-priority-high",
+    estimate: "5",
+    assignee: "AL",
+    avatar: avatar0
+  },
+  {
+    id: "ENG-396",
+    title: "Audit bug-fix tagging for missing engineering hours",
+    status: "Done",
+    priorityIcon: "priority-medium",
+    priorityClassName: "survey-kpi-drill-in-priority-medium",
+    estimate: "3",
+    assignee: "IR",
+    avatar: avatar2
+  }
+] as const;
+
+function StyleGuideIssuesTable() {
+  return (
+    <div className="survey-kpi-drill-in-table" role="table" aria-label="Issues table preview">
+      {STYLE_GUIDE_ISSUE_ROWS.map((row) => (
+        <div key={row.id} className="survey-kpi-drill-in-row" role="row">
+          <div className="survey-kpi-drill-in-main" role="cell">
+            <span className="survey-kpi-drill-in-id">{row.id}</span>
+            <span className="survey-kpi-drill-in-title">{row.title}</span>
+          </div>
+          <div className="survey-kpi-drill-in-meta" role="cell" aria-label="Issue metadata">
+            <span className="survey-kpi-drill-in-status">{row.status}</span>
+            <button
+              type="button"
+              className={`survey-kpi-drill-in-icon-button survey-kpi-drill-in-priority-button ${row.priorityClassName}`.trim()}
+              aria-label="Priority"
+            >
+              <SurveyIcon name={row.priorityIcon} fixedWidth />
+            </button>
+            <span className="survey-kpi-drill-in-estimate">{row.estimate}</span>
+            <button
+              type="button"
+              className="survey-kpi-drill-in-icon-button survey-kpi-drill-in-assignee-button"
+              aria-label={`Assignee ${row.assignee}`}
+            >
+              <span className="survey-kpi-assignee-avatar" aria-hidden="true">
+                <img src={row.avatar} alt="" />
+              </span>
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ColorList({
   title,
   className,
@@ -106,11 +191,20 @@ function ColorList({
   );
 }
 
-export function StyleGuidePage({ themeMode }: { themeMode: SurveyThemeMode }) {
+export function StyleGuidePage({
+  themeMode,
+  onSidebarToggle,
+  showSidebarToggle
+}: {
+  themeMode: SurveyThemeMode;
+  onSidebarToggle: () => void;
+  showSidebarToggle: boolean;
+}) {
   const [toggleStates, setToggleStates] = useState({
     notifications: true,
     reminders: false
   });
+  const [showDrillInPanel, setShowDrillInPanel] = useState(false);
 
   const showDefaultToast = () => {
     toast("New survey insights are ready", {
@@ -139,10 +233,26 @@ export function StyleGuidePage({ themeMode }: { themeMode: SurveyThemeMode }) {
     });
   };
 
+  const showUndoToast = () => {
+    toast.undo("Report deleted", {
+      description: "The KPI report was removed from pinned reports.",
+      onUndo: () => {
+        toast.success("Delete undone", {
+          description: "The KPI report was restored to pinned reports."
+        });
+      }
+    });
+  };
+
   return (
     <section className="survey-main-canvas style-guide-page-shell">
       <div className="style-guide-page-body">
-        <h1 className="style-guide-title">Style Guide</h1>
+        <header className="survey-canvas-section-header style-guide-page-header">
+          <div className="survey-canvas-header-leading">
+            {showSidebarToggle ? <CanvasSidebarToggle onToggle={onSidebarToggle} /> : null}
+            <h1 className="style-guide-title">Style Guide</h1>
+          </div>
+        </header>
 
         <section className="style-guide-block">
           <h2>Typography</h2>
@@ -203,6 +313,18 @@ export function StyleGuidePage({ themeMode }: { themeMode: SurveyThemeMode }) {
                       </div>
                     </div>
                   </article>
+
+                  <article className="style-guide-toast-card">
+                    <div className="style-guide-toast-copy">
+                      <div className="style-guide-toast-title">Report deleted</div>
+                      <div className="style-guide-toast-description">
+                        The KPI report was removed from pinned reports.
+                      </div>
+                    </div>
+                    <button type="button" className="style-guide-toast-button">
+                      Undo
+                    </button>
+                  </article>
                 </div>
               </div>
             </div>
@@ -222,6 +344,65 @@ export function StyleGuidePage({ themeMode }: { themeMode: SurveyThemeMode }) {
                 <Button variant="secondary" onClick={showPromiseToast}>
                   Promise toast
                 </Button>
+                <Button variant="secondary" onClick={showUndoToast}>
+                  Undo toast
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="style-guide-block">
+          <h2>Priority icons</h2>
+          <div className="style-guide-stack">
+            <div className="style-guide-component-row">
+              <div className="style-guide-row-label">Set</div>
+              <div className="style-guide-component-preview style-guide-component-preview-wrap">
+                {PRIORITY_STYLE_GUIDE_ITEMS.map((item) => (
+                  <div key={item.label} className="style-guide-priority-item">
+                    <span
+                      className={`survey-kpi-drill-in-icon-button survey-kpi-drill-in-priority-button ${item.className}`.trim()}
+                      aria-hidden="true"
+                    >
+                      <SurveyIcon name={item.icon} fixedWidth />
+                    </span>
+                    <span className="style-guide-small-text">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="style-guide-block">
+          <h2>Work type badges</h2>
+          <div className="style-guide-stack">
+            <div className="style-guide-component-row">
+              <div className="style-guide-row-label">Set</div>
+              <div className="style-guide-component-preview style-guide-component-preview-wrap">
+                {WORK_TYPE_BADGE_ITEMS.map((item) => (
+                  <WorkTypeBadge key={item} workType={item} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="style-guide-block">
+          <h2>Drill-in panel</h2>
+          <div className="style-guide-stack">
+            <div className="style-guide-component-row">
+              <div className="style-guide-row-label">Trigger</div>
+              <div className="style-guide-component-preview style-guide-component-preview-wrap">
+                <Button variant="secondary" onClick={() => setShowDrillInPanel(true)}>
+                  Open drill-in panel
+                </Button>
+              </div>
+            </div>
+            <div className="style-guide-component-row style-guide-component-row-align-start">
+              <div className="style-guide-row-label">Issues table</div>
+              <div className="style-guide-component-preview style-guide-issues-table-preview">
+                <StyleGuideIssuesTable />
               </div>
             </div>
           </div>
@@ -480,7 +661,43 @@ export function StyleGuidePage({ themeMode }: { themeMode: SurveyThemeMode }) {
             </div>
           </div>
         </section>
+
+        <section className="style-guide-block">
+          <h2>Charts</h2>
+          <div className="style-guide-stack">
+            <div className="style-guide-component-row style-guide-chart-row">
+              <div className="style-guide-row-label">Investments</div>
+              <div className="style-guide-component-preview style-guide-chart-preview">
+                <div className="style-guide-chart-card">
+                  <div className="style-guide-chart-copy">
+                    <strong>Investments chart</strong>
+                    <span>shadcn/ui chart primitives mapped into the current design system</span>
+                  </div>
+                  <InvestmentsChart className="style-guide-chart-frame" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
+
+      {showDrillInPanel ? (
+        <DrillInPanel
+          ariaLabel="Style guide drill in preview"
+          contentClassName="survey-report-drill-in-content"
+          isVisible={showDrillInPanel}
+          onClose={() => setShowDrillInPanel(false)}
+          title={
+            <>
+              <span>Cycle time</span>
+              <span className="survey-details-slash"> / </span>
+              <span>Platform</span>
+            </>
+          }
+        >
+          <div className="survey-report-drill-in-empty" />
+        </DrillInPanel>
+      ) : null}
     </section>
   );
 }

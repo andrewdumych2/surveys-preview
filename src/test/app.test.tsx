@@ -13,6 +13,7 @@ function renderApp(initialEntries: string[] = ["/surveys"]) {
 
 beforeEach(() => {
   window.localStorage.clear();
+  toast.dismiss();
 });
 
 describe("surveys results page", () => {
@@ -166,7 +167,7 @@ describe("surveys results page", () => {
     expect(screen.getByLabelText(/scheduled survey state/i)).toBeInTheDocument();
   });
 
-  it("collapses and expands sidebar sections from the full section area", () => {
+  it("collapses and expands sidebar sections only from the section trigger", () => {
     renderApp();
 
     const myTeamsToggle = screen.getByRole("button", { name: /^my teams$/i });
@@ -180,13 +181,13 @@ describe("surveys results page", () => {
 
     fireEvent.click(within(myTeamsSection as HTMLElement).getByText(/^integrations$/i));
 
-    expect(myTeamsToggle).toHaveAttribute("aria-expanded", "false");
-    expect(myTeamsContent).toHaveAttribute("aria-hidden", "true");
+    expect(myTeamsToggle).toHaveAttribute("aria-expanded", "true");
+    expect(myTeamsContent).toHaveAttribute("aria-hidden", "false");
 
     fireEvent.click(myTeamsToggle);
 
-    expect(myTeamsToggle).toHaveAttribute("aria-expanded", "true");
-    expect(myTeamsContent).toHaveAttribute("aria-hidden", "false");
+    expect(myTeamsToggle).toHaveAttribute("aria-expanded", "false");
+    expect(myTeamsContent).toHaveAttribute("aria-hidden", "true");
   });
 
   it("opens the style guide route from the sidebar", () => {
@@ -201,6 +202,64 @@ describe("surveys results page", () => {
     expect(screen.queryByRole("heading", { name: /^dark$/i })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /^toggle$/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /^icon button$/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^charts$/i })).toBeInTheDocument();
+    expect(screen.getByText(/investments chart/i)).toBeInTheDocument();
+    expect(screen.getByText(/shadcn\/ui chart primitives mapped into the current design system/i)).toBeInTheDocument();
+  });
+
+  it("opens the KPI reports page from pinned reports", () => {
+    renderApp();
+
+    fireEvent.click(screen.getByRole("button", { name: /^kpis$/i }));
+
+    const kpiCards = screen.getByLabelText(/kpi cards/i);
+
+    expect(screen.getByRole("heading", { name: /^kpi report$/i })).toBeInTheDocument();
+    expect(screen.getByText(/high level view of your teams' key health metrics/i)).toBeInTheDocument();
+    expect(within(kpiCards).getByRole("heading", { name: /^cycle time$/i })).toBeInTheDocument();
+    expect(within(kpiCards).getByRole("heading", { name: /^investments$/i })).toBeInTheDocument();
+    expect(within(kpiCards).getByRole("heading", { name: /^issues completed$/i })).toBeInTheDocument();
+    expect(within(kpiCards).getByRole("heading", { name: /^bug resolution time$/i })).toBeInTheDocument();
+    expect(within(kpiCards).getAllByText(/^features$/i).length).toBeGreaterThan(0);
+    expect(within(kpiCards).getAllByText(/^bugs$/i).length).toBeGreaterThan(0);
+    expect(within(kpiCards).getAllByText(/^maintenance$/i).length).toBeGreaterThan(0);
+    expect(within(kpiCards).getAllByText(/^team$/i).length).toBeGreaterThan(0);
+    expect(within(kpiCards).getByRole("button", { name: /^sort ascending$/i })).toBeInTheDocument();
+  });
+
+  it("renders the shadcn KPI experiment route", () => {
+    renderApp(["/reports/kpis-shadcn"]);
+
+    expect(screen.getByText(/shadcn experiment/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^kpi report$/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /open current kpi page/i })).toBeInTheDocument();
+    expect(screen.getByText(/branch-only exploration/i)).toBeInTheDocument();
+  });
+
+  it("toggles the KPI report pin state with matching toast feedback", async () => {
+    renderApp(["/reports/kpis"]);
+
+    const pinButton = screen.getByRole("button", { name: /^pin report$/i });
+
+    expect(pinButton).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.click(pinButton);
+
+    expect(screen.getByRole("button", { name: /^pin report$/i })).toHaveAttribute("aria-pressed", "false");
+    expect(toast.getToasts().length).toBeGreaterThan(0);
+
+    await waitFor(() => {
+      expect(screen.getByText(/^unpinned$/i)).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /^pin report$/i }));
+
+    expect(screen.getByRole("button", { name: /^pin report$/i })).toHaveAttribute("aria-pressed", "true");
+    expect(toast.getToasts().length).toBeGreaterThan(0);
+
+    await waitFor(() => {
+      expect(screen.getByText(/^pinned$/i)).toBeInTheDocument();
+    });
   });
 
   it("toggles the style guide switch examples when clicked", () => {
@@ -222,12 +281,13 @@ describe("surveys results page", () => {
   it("shows a toast when the style guide trigger is clicked", async () => {
     renderApp(["/style-guide"]);
 
+    const initialToastCount = toast.getToasts().length;
+
     expect(document.querySelectorAll("[data-sonner-toast]")).toHaveLength(0);
-    expect(toast.getToasts()).toHaveLength(0);
 
     fireEvent.click(screen.getByRole("button", { name: /^default toast$/i }));
 
-    expect(toast.getToasts().length).toBeGreaterThan(0);
+    expect(toast.getToasts().length).toBeGreaterThan(initialToastCount);
 
     await waitFor(() => {
       expect(document.querySelectorAll("[data-sonner-toast]").length).toBeGreaterThan(0);

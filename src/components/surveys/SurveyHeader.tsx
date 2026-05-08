@@ -5,6 +5,7 @@ import {
   type SurveyDataset,
   type SurveyTabId
 } from "../../data/surveysData";
+import { CanvasSidebarToggle } from "./CanvasSidebarToggle";
 import { SurveyIcon } from "./SurveyIcons";
 import { SurveyPicker } from "./SurveyPicker";
 import { SurveyParticipationLabel } from "./SurveyParticipationLabel";
@@ -49,14 +50,18 @@ function SurveySwitcher({
 export function SurveyHeader({
   activeTab,
   activeSurveyId,
+  onSidebarToggle,
   surveys,
+  showSidebarToggle,
   onSurveyChange,
   onTabChange,
   onOpenSettings
 }: {
   activeTab: SurveyTabId;
   activeSurveyId: string;
+  onSidebarToggle: () => void;
   surveys: SurveyDataset[];
+  showSidebarToggle: boolean;
   onSurveyChange: (surveyId: string) => void;
   onTabChange: (tab: SurveyTabId) => void;
   onOpenSettings: () => void;
@@ -66,9 +71,7 @@ export function SurveyHeader({
   return (
     <header className="survey-header">
       <div className="survey-header-left">
-        <button type="button" className="survey-sidebar-toggle" aria-label="Toggle sidebar">
-          <SurveyIcon name="menu" />
-        </button>
+        {showSidebarToggle ? <CanvasSidebarToggle onToggle={onSidebarToggle} /> : null}
 
         <SurveySwitcher activeSurveyId={activeSurveyId} surveys={surveys} onSurveyChange={onSurveyChange} />
 

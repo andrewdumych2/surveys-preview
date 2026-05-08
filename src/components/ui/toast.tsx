@@ -1,4 +1,5 @@
-import { Toaster as SonnerToaster, toast } from "sonner";
+import type { ReactNode } from "react";
+import { Toaster as SonnerToaster, toast as sonnerToast, type ExternalToast } from "sonner";
 import type { SurveyThemeMode } from "../../App";
 
 interface AppToasterProps {
@@ -33,5 +34,26 @@ export function AppToaster({ themeMode }: AppToasterProps) {
     />
   );
 }
+
+type UndoToastOptions = Omit<ExternalToast, "action"> & {
+  onUndo: () => void;
+  undoLabel?: string;
+};
+
+const toast = Object.assign(sonnerToast, {
+  undo(message: ReactNode, options: UndoToastOptions) {
+    const { onUndo, undoLabel = "Undo", ...toastOptions } = options;
+
+    return sonnerToast(message, {
+      ...toastOptions,
+      action: {
+        label: undoLabel,
+        onClick: () => {
+          onUndo();
+        }
+      }
+    });
+  }
+});
 
 export { toast };

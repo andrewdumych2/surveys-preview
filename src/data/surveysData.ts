@@ -442,7 +442,7 @@ export function getSurveyCellDetails(selection: SurveyCellSelection, surveyId?: 
 
   return {
     title: selection.rowLabel,
-    team: selection.columnLabel === "Average" ? `${selection.columnLabel} · ${survey.menuLabel}` : selection.columnLabel,
+    team: selection.columnLabel,
     average: selection.value === null ? "-" : selection.value.toFixed(1),
     previousChange: delta.value,
     previousDirection: delta.direction,
