@@ -227,15 +227,6 @@ describe("surveys results page", () => {
     expect(within(kpiCards).getByRole("button", { name: /^sort ascending$/i })).toBeInTheDocument();
   });
 
-  it("renders the shadcn KPI experiment route", () => {
-    renderApp(["/reports/kpis-shadcn"]);
-
-    expect(screen.getByText(/shadcn experiment/i)).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /^kpi report$/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /open current kpi page/i })).toBeInTheDocument();
-    expect(screen.getByText(/branch-only exploration/i)).toBeInTheDocument();
-  });
-
   it("toggles the KPI report pin state with matching toast feedback", async () => {
     renderApp(["/reports/kpis"]);
 

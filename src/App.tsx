@@ -14,7 +14,6 @@ import { SurveySidebar } from "./components/surveys/SurveySidebar";
 import { AppToaster } from "./components/ui/toast";
 import { AllReportsPage } from "./pages/AllReportsPage";
 import { KpiReportsPage } from "./pages/KpiReportsPage";
-import { KpiReportsShadcnPage } from "./pages/KpiReportsShadcnPage";
 import { StyleGuidePage } from "./pages/StyleGuidePage";
 import { SurveysResultsPage } from "./pages/SurveysResultsPage";
 import { SurveysSettingsPage } from "./pages/SurveysSettingsPage";
@@ -183,15 +182,6 @@ export default function App() {
           <Route
             path="/reports/kpis"
             element={<KpiReportsPage onSidebarToggle={handleSidebarToggle} showSidebarToggle={isSidebarCollapsed} />}
-          />
-          <Route
-            path="/reports/kpis-shadcn"
-            element={
-              <KpiReportsShadcnPage
-                onSidebarToggle={handleSidebarToggle}
-                showSidebarToggle={isSidebarCollapsed}
-              />
-            }
           />
           <Route
             path="/surveys"
